@@ -2,21 +2,29 @@ package org.todoapp
 
 import grails.converters.JSON
 class TaskController {
+	def simpleDateFormatUTC=new java.text.SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+
 	def show={
 		if(params.id && Task.exists(params.id)){
 			render Task.findById(params.id) as JSON
 		}else{
 			render Task.list() as JSON
 		}
-	}
+		}
 
 	def save={
 		println "inside [save] rest method"
-		def jsonTaskObj=request.JSON['todo'];
-		def task=new Task(jsonTaskObj);
+		def jsonTaskObj=request.JSON['todo']
+		def task=new Task()
+		println jsonTaskObj.dueDate
+		task.dueDate=simpleDateFormatUTC.parse(jsonTaskObj.dueDate)
+		task.description=jsonTaskObj.description
+		task.title=jsonTaskObj.title
+		task.isCompleted=jsonTaskObj.isCompleted
 		if(task.save(flush: true)){
 			render task as JSON
 		}else{
+			render status:500
 		}
 	}
 
@@ -47,6 +55,7 @@ class TaskController {
 				todo.title=jsonTaskObj.title
 				todo.description=jsonTaskObj.description
 				todo.isCompleted=jsonTaskObj.isCompleted
+				todo.dueDate=jsonTaskObj.dueDate
 				println todo.isCompleted
 				todo.dueDate=new Date();
 				if(todo.save(flush: true))
