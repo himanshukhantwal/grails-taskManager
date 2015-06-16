@@ -52,12 +52,12 @@ class TaskController {
 		if(params.id){
 			todo=Task.get(params.id)
 			if(todo){
+				println jsonTaskObj.dueDate
 				todo.title=jsonTaskObj.title
 				todo.description=jsonTaskObj.description
 				todo.isCompleted=jsonTaskObj.isCompleted
-				todo.dueDate=jsonTaskObj.dueDate
-				println todo.isCompleted
-				todo.dueDate=new Date();
+				todo.dueDate=simpleDateFormatUTC.parse(jsonTaskObj.dueDate)
+				
 				if(todo.save(flush: true))
 				render todo as JSON
 			}
